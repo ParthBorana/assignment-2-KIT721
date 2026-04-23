@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "614427916050",
+    "project_id": "interiorquote-74ecb",
+    "storage_bucket": "interiorquote-74ecb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614427916050:android:4baa66ccb87941283d25cb",
+        "android_client_info": {
+          "package_name": "au.edu.utas.pborana.interiorquote"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCceYZd6HqSiSJiSMmpPMhJaigWtmJFAtY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
