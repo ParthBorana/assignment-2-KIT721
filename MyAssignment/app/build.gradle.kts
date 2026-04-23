@@ -4,10 +4,15 @@ plugins {
 
 android {
     namespace = "au.edu.utas.pborana.interiorquote"
+
+    buildFeatures {
+        viewBinding = true
+    }
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
         }
+
     }
 
     defaultConfig {
