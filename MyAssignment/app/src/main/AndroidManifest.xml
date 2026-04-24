@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.InteriorQuote">
         <activity
+            android:name=".AddEditWindowActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RoomDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddEditRoomActivity"
+            android:exported="false" />
+        <activity
             android:name=".HouseDetailActivity"
             android:exported="false" />
         <activity
