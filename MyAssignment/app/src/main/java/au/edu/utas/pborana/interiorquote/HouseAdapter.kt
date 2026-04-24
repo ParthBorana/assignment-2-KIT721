@@ -31,6 +31,13 @@ class HouseAdapter(private val houses: MutableList<House>) :
             intent.putExtra("CUSTOMER_NAME", house.customerName)
             holder.itemView.context.startActivity(intent)
         }
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, HouseDetailActivity::class.java)
+            intent.putExtra("HOUSE_ID", house.id)
+            intent.putExtra("HOUSE_NAME", house.name)
+            holder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int {

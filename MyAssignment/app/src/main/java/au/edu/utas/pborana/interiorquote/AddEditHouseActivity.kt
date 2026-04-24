@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.firestore.FirebaseFirestore
+import android.view.View
+import androidx.appcompat.app.AlertDialog
 
 class AddEditHouseActivity : AppCompatActivity() {
 
@@ -27,6 +29,7 @@ class AddEditHouseActivity : AppCompatActivity() {
         val txtHouseAddress = findViewById<EditText>(R.id.txtHouseAddress)
         val txtCustomerName = findViewById<EditText>(R.id.txtCustomerName)
         val btnSaveHouse = findViewById<Button>(R.id.btnSaveHouse)
+        val btnDeleteHouse = findViewById<Button>(R.id.btnDeleteHouse)
 
         btnBack.setOnClickListener {
             finish()
@@ -41,6 +44,7 @@ class AddEditHouseActivity : AppCompatActivity() {
         if (houseId != null) {
             txtTitle.text = "Edit House"
             btnSaveHouse.text = "Update House"
+            btnDeleteHouse.visibility = View.VISIBLE
 
             txtHouseName.setText(houseName)
             txtHouseAddress.setText(houseAddress)
@@ -87,6 +91,26 @@ class AddEditHouseActivity : AppCompatActivity() {
                         Toast.makeText(this, "Failed to update house", Toast.LENGTH_SHORT).show()
                     }
             }
+        }
+
+        btnDeleteHouse.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Delete House")
+                .setMessage("Are you sure you want to delete this house?")
+                .setPositiveButton("Delete") { _, _ ->
+                    db.collection("houses")
+                        .document(houseId!!)
+                        .delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "House deleted", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Failed to delete house", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
