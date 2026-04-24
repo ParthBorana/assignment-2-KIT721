@@ -56,6 +56,15 @@ class AddEditWindowActivity : AppCompatActivity() {
             txtName.setText(intent.getStringExtra("WINDOW_NAME"))
             txtWidth.setText(intent.getDoubleExtra("WINDOW_WIDTH", 0.0).toString())
             txtHeight.setText(intent.getDoubleExtra("WINDOW_HEIGHT", 0.0).toString())
+
+            selectedProductName = intent.getStringExtra("WINDOW_PRODUCT_NAME") ?: ""
+            selectedProductPrice = intent.getDoubleExtra("WINDOW_PRODUCT_PRICE", 50.0)
+            selectedProductColour = intent.getStringExtra("WINDOW_PRODUCT_COLOUR") ?: ""
+
+            if (selectedProductName.isNotEmpty()) {
+                btnSelectProduct.text =
+                    "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+            }
         }
 
         btnSave.setOnClickListener {
@@ -153,6 +162,34 @@ class AddEditWindowActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Select Product")
             .setItems(productNames) { _, which ->
+                val width = findViewById<EditText>(R.id.txtWidth).text.toString().toDoubleOrNull()
+                val height = findViewById<EditText>(R.id.txtHeight).text.toString().toDoubleOrNull()
+
+                if (width == null || height == null) {
+                    Toast.makeText(this, "Enter width and height first", Toast.LENGTH_SHORT).show()
+                    return@setItems
+                }
+
+                if (which == 0 && (width < 500.0 || width > 1200.0)) {
+                    Toast.makeText(this, "Standard Roller Blind width must be 500–1200 mm", Toast.LENGTH_SHORT).show()
+                    return@setItems
+                }
+
+                if (which == 1 && (width < 500.0 || width > 2000.0)) {
+                    Toast.makeText(this, "Premium Curtain width must be 500–2000 mm", Toast.LENGTH_SHORT).show()
+                    return@setItems
+                }
+
+                if (which == 2 && width != 800.0) {
+                    Toast.makeText(this, "Luxury Shutter only supports 800 mm width", Toast.LENGTH_SHORT).show()
+                    return@setItems
+                }
+
+                if (height < 500.0 || height > 2500.0) {
+                    Toast.makeText(this, "Height must be 500–2500 mm", Toast.LENGTH_SHORT).show()
+                    return@setItems
+                }
+
                 selectedProductName = productNames[which]
                 selectedProductPrice = prices[which]
                 selectedProductColour = colours[which]

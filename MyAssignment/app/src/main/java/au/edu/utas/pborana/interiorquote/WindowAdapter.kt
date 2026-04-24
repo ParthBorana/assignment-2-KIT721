@@ -24,7 +24,14 @@ class WindowAdapter(
         val window = windows[position]
 
         holder.ui.txtWindowName.text = window.name
-        holder.ui.txtWindowSize.text = "${window.width} x ${window.height} mm"
+
+        if (window.productName.isNotEmpty()) {
+            holder.ui.txtWindowSize.text =
+                "${window.width} x ${window.height} mm\nProduct: ${window.productName} - ${window.productColour}"
+        } else {
+            holder.ui.txtWindowSize.text =
+                "${window.width} x ${window.height} mm\nProduct: Not selected"
+        }
 
         holder.ui.btnEditWindow.setOnClickListener {
             val intent = Intent(holder.itemView.context, AddEditWindowActivity::class.java)
@@ -34,6 +41,9 @@ class WindowAdapter(
             intent.putExtra("WINDOW_NAME", window.name)
             intent.putExtra("WINDOW_WIDTH", window.width)
             intent.putExtra("WINDOW_HEIGHT", window.height)
+            intent.putExtra("WINDOW_PRODUCT_NAME", window.productName)
+            intent.putExtra("WINDOW_PRODUCT_PRICE", window.productPricePerSqm)
+            intent.putExtra("WINDOW_PRODUCT_COLOUR", window.productColour)
             holder.itemView.context.startActivity(intent)
         }
     }
