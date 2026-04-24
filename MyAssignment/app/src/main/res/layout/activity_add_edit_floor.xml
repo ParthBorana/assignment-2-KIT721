@@ -29,17 +29,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Add Window"
+            android:text="Add Floor Space"
             android:textSize="22sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <EditText
-        android:id="@+id/txtWindowName"
+        android:id="@+id/txtFloorName"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_margin="16dp"
-        android:hint="Window Name"
+        android:hint="Floor Space Name"
+        android:inputType="text"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -50,7 +51,7 @@
         android:layout_height="48dp"
         android:layout_marginHorizontal="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/txtWindowName"
+        app:layout_constraintTop_toBottomOf="@id/txtFloorName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -71,7 +72,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/heightRow"
+        android:id="@+id/depthRow"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_margin="16dp"
@@ -81,11 +82,11 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <EditText
-            android:id="@+id/txtHeight"
+            android:id="@+id/txtDepth"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:hint="Height"
+            android:hint="Depth"
             android:inputType="numberDecimal" />
 
         <TextView
@@ -97,36 +98,26 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btnSelectProduct"
+        android:id="@+id/btnSaveFloor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Select Product"
-        app:layout_constraintTop_toBottomOf="@id/heightRow"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <Button
-        android:id="@+id/btnSaveWindow"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Save Window"
-        app:layout_constraintTop_toBottomOf="@id/btnSelectProduct"
+        android:text="Save Floor Space"
+        app:layout_constraintTop_toBottomOf="@id/depthRow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
-        android:id="@+id/btnDeleteWindow"
+        android:id="@+id/btnDeleteFloor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Delete Window"
         android:backgroundTint="#F44336"
+        android:text="Delete Floor Space"
         android:textColor="@android:color/white"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/btnSaveWindow"
+        app:layout_constraintTop_toBottomOf="@id/btnSaveFloor"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

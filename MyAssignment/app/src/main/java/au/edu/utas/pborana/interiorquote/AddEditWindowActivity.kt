@@ -1,10 +1,10 @@
 package au.edu.utas.pborana.interiorquote
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,6 +17,10 @@ class AddEditWindowActivity : AppCompatActivity() {
     private var houseId: String? = null
     private var roomId: String? = null
     private var windowId: String? = null
+
+    private var selectedProductName = ""
+    private var selectedProductPrice = 50.0
+    private var selectedProductColour = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,13 +35,19 @@ class AddEditWindowActivity : AppCompatActivity() {
         val txtName = findViewById<EditText>(R.id.txtWindowName)
         val txtWidth = findViewById<EditText>(R.id.txtWidth)
         val txtHeight = findViewById<EditText>(R.id.txtHeight)
+        val btnSelectProduct = findViewById<Button>(R.id.btnSelectProduct)
         val btnSave = findViewById<Button>(R.id.btnSaveWindow)
         val btnDelete = findViewById<Button>(R.id.btnDeleteWindow)
         val txtTitle = findViewById<TextView>(R.id.txtTitle)
 
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            finish()
+        }
 
-        // EDIT MODE
+        btnSelectProduct.setOnClickListener {
+            showProductDialog(btnSelectProduct)
+        }
+
         if (windowId != null) {
             txtTitle.text = "Edit Window"
             btnSave.text = "Update Window"
@@ -49,7 +59,6 @@ class AddEditWindowActivity : AppCompatActivity() {
         }
 
         btnSave.setOnClickListener {
-
             val name = txtName.text.toString().trim()
             val width = txtWidth.text.toString().toDoubleOrNull()
             val height = txtHeight.text.toString().toDoubleOrNull()
@@ -59,12 +68,18 @@ class AddEditWindowActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (houseId == null || roomId == null) return@setOnClickListener
+            if (houseId == null || roomId == null) {
+                Toast.makeText(this, "Missing room information", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             val window = Window(
                 name = name,
                 width = width,
-                height = height
+                height = height,
+                productName = selectedProductName,
+                productPricePerSqm = selectedProductPrice,
+                productColour = selectedProductColour
             )
 
             val ref = db.collection("houses")
@@ -74,24 +89,30 @@ class AddEditWindowActivity : AppCompatActivity() {
                 .collection("windows")
 
             if (windowId == null) {
-                // ADD
                 ref.add(window)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Window saved", Toast.LENGTH_SHORT).show()
                         finish()
                     }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error saving window", Toast.LENGTH_SHORT).show()
+                    }
             } else {
-                // UPDATE
                 ref.document(windowId!!)
                     .set(window)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Window updated", Toast.LENGTH_SHORT).show()
                         finish()
                     }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error updating window", Toast.LENGTH_SHORT).show()
+                    }
             }
         }
 
         btnDelete.setOnClickListener {
+            if (houseId == null || roomId == null || windowId == null) return@setOnClickListener
+
             AlertDialog.Builder(this)
                 .setTitle("Delete Window")
                 .setMessage("Are you sure?")
@@ -117,5 +138,26 @@ class AddEditWindowActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun showProductDialog(btnSelectProduct: Button) {
+        val productNames = arrayOf(
+            "Standard Roller Blind",
+            "Premium Curtain",
+            "Luxury Shutter"
+        )
+
+        val prices = arrayOf(50.0, 80.0, 120.0)
+        val colours = arrayOf("White", "Grey", "Black")
+
+        AlertDialog.Builder(this)
+            .setTitle("Select Product")
+            .setItems(productNames) { _, which ->
+                selectedProductName = productNames[which]
+                selectedProductPrice = prices[which]
+                selectedProductColour = colours[which]
+                btnSelectProduct.text = "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+            }
+            .show()
     }
 }

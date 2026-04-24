@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.InteriorQuote">
         <activity
+            android:name=".QuoteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddEditFloorActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddEditWindowActivity"
             android:exported="false" />
         <activity

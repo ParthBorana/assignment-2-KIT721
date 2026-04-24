@@ -52,6 +52,12 @@ class HouseDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        findViewById<Button>(R.id.btnViewQuote).setOnClickListener {
+            val intent = Intent(this, QuoteActivity::class.java)
+            intent.putExtra("HOUSE_ID", houseId)
+            startActivity(intent)
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

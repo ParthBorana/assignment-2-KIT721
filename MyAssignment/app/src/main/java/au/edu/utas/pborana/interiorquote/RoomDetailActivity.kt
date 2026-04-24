@@ -21,8 +21,13 @@ class RoomDetailActivity : AppCompatActivity() {
     private var roomId: String? = null
     private var roomName: String? = null
 
+    // WINDOWS
     private val windows = mutableListOf<Window>()
     private lateinit var rvWindows: RecyclerView
+
+    // FLOORS
+    private val floors = mutableListOf<FloorSpace>()
+    private lateinit var rvFloors: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,12 +44,20 @@ class RoomDetailActivity : AppCompatActivity() {
             finish()
         }
 
+        // WINDOWS SETUP
         rvWindows = findViewById(R.id.rvWindows)
         rvWindows.layoutManager = LinearLayoutManager(this)
 
+        // FLOORS SETUP
+        rvFloors = findViewById(R.id.rvFloors)
+        rvFloors.layoutManager = LinearLayoutManager(this)
+
         if (houseId != null && roomId != null) {
             rvWindows.adapter = WindowAdapter(windows, houseId!!, roomId!!)
+            rvFloors.adapter = FloorAdapter(floors, houseId!!, roomId!!)
+
             loadWindows()
+            loadFloors()
         } else {
             Toast.makeText(this, "Missing room information", Toast.LENGTH_SHORT).show()
         }
@@ -57,7 +70,10 @@ class RoomDetailActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnAddFloor).setOnClickListener {
-            Toast.makeText(this, "Floor spaces will be added next", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AddEditFloorActivity::class.java)
+            intent.putExtra("HOUSE_ID", houseId)
+            intent.putExtra("ROOM_ID", roomId)
+            startActivity(intent)
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -92,10 +108,38 @@ class RoomDetailActivity : AppCompatActivity() {
             }
     }
 
+    private fun loadFloors() {
+        if (houseId == null || roomId == null) return
+
+        db.collection("houses")
+            .document(houseId!!)
+            .collection("rooms")
+            .document(roomId!!)
+            .collection("floors")
+            .get()
+            .addOnSuccessListener { result ->
+                floors.clear()
+
+                for (document in result) {
+                    val floor = document.toObject(FloorSpace::class.java)
+                    floor.id = document.id
+                    floors.add(floor)
+                }
+
+                rvFloors.adapter?.notifyDataSetChanged()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load floors", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     override fun onResume() {
         super.onResume()
         if (::rvWindows.isInitialized) {
             loadWindows()
+        }
+        if (::rvFloors.isInitialized) {
+            loadFloors()
         }
     }
 }
