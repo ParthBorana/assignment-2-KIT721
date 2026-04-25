@@ -18,6 +18,8 @@ class AddEditFloorActivity : AppCompatActivity() {
     private var roomId: String? = null
     private var floorId: String? = null
 
+    private val productList = mutableListOf<Product>()
+
     private var selectedProductName = ""
     private var selectedProductPrice = 100.0
     private var selectedProductColour = ""
@@ -149,6 +151,8 @@ class AddEditFloorActivity : AppCompatActivity() {
                 .show()
         }
 
+        loadProductsFromAPI()
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -156,53 +160,94 @@ class AddEditFloorActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadProductsFromAPI() {
+        Thread {
+            try {
+                val url = java.net.URL("https://utasbot.dev/kit305_2026/product?category=floor")
+                val connection = url.openConnection() as java.net.HttpURLConnection
+                connection.requestMethod = "GET"
+
+                val reader = java.io.BufferedReader(
+                    java.io.InputStreamReader(connection.inputStream)
+                )
+
+                val response = reader.readText()
+                val jsonObject = org.json.JSONObject(response)
+                val jsonArray = jsonObject.getJSONArray("data")
+
+                val tempList = mutableListOf<Product>()
+
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+                    val variants = obj.getJSONArray("variants")
+
+                    val colours = mutableListOf<String>()
+                    for (j in 0 until variants.length()) {
+                        colours.add(variants.getString(j))
+                    }
+
+                    val product = Product(
+                        id = obj.getString("id"),
+                        name = obj.getString("name"),
+                        type = obj.getString("category"),
+                        description = obj.getString("description"),
+                        pricePerSqm = obj.getDouble("price_per_sqm"),
+                        imageUrl = obj.getString("imageUrl"),
+                        colours = colours,
+                        minWidth = 0.0,
+                        maxWidth = 0.0,
+                        minHeight = 0.0,
+                        maxHeight = 0.0,
+                        maxPanels = 1
+                    )
+
+                    tempList.add(product)
+                }
+
+                runOnUiThread {
+                    productList.clear()
+                    productList.addAll(tempList)
+                }
+
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "API failed to load floor products", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
+    }
+
     private fun showProductDialog(btnSelectProduct: Button) {
+        if (productList.isEmpty()) {
+            Toast.makeText(this, "Products still loading, try again", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        val productNames = arrayOf(
-            "Budget Carpet",
-            "Vinyl Flooring",
-            "Premium Timber"
-        )
-
-        val descriptions = arrayOf(
-            "Affordable soft carpet flooring",
-            "Durable waterproof vinyl flooring",
-            "High quality natural timber finish"
-        )
-
-        val prices = arrayOf(100.0, 130.0, 180.0)
-
-        val imageUrls = arrayOf(
-            "https://example.com/carpet.jpg",
-            "https://example.com/vinyl.jpg",
-            "https://example.com/timber.jpg"
-        )
-
-        val colourOptions = arrayOf(
-            arrayOf("Beige", "Brown"),
-            arrayOf("Grey", "Black"),
-            arrayOf("Oak", "Walnut")
-        )
+        val productNames = productList.map { it.name }.toTypedArray()
 
         AlertDialog.Builder(this)
             .setTitle("Select Floor Product")
             .setItems(productNames) { _, which ->
 
+                val product = productList[which]
+                val colours = product.colours.toTypedArray()
+
                 AlertDialog.Builder(this)
                     .setTitle("Select Colour")
-                    .setItems(colourOptions[which]) { _, colourIndex ->
+                    .setItems(colours) { _, colourIndex ->
 
-                        selectedProductName = productNames[which]
-                        selectedProductPrice = prices[which]
-                        selectedProductColour = colourOptions[which][colourIndex]
-
-                        val desc = descriptions[which]
-                        val img = imageUrls[which]
+                        selectedProductName = product.name
+                        selectedProductPrice = product.pricePerSqm
+                        selectedProductColour = colours[colourIndex]
 
                         btnSelectProduct.text =
                             "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
 
-                        btnSelectProduct.tag = Triple(desc, img, selectedProductColour)
+                        btnSelectProduct.tag = Triple(
+                            product.description,
+                            product.imageUrl,
+                            selectedProductColour
+                        )
                     }
                     .show()
             }
