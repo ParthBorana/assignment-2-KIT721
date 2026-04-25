@@ -24,7 +24,14 @@ class FloorAdapter(
         val floor = floors[position]
 
         holder.ui.txtFloorName.text = floor.name
-        holder.ui.txtFloorSize.text = "${floor.width} x ${floor.depth} mm"
+
+        if (floor.productName.isNotEmpty()) {
+            holder.ui.txtFloorSize.text =
+                "${floor.width} x ${floor.depth} mm\nProduct: ${floor.productName} - ${floor.productColour}"
+        } else {
+            holder.ui.txtFloorSize.text =
+                "${floor.width} x ${floor.depth} mm\nProduct: Not selected"
+        }
 
         holder.ui.btnEditFloor.setOnClickListener {
             val intent = Intent(holder.itemView.context, AddEditFloorActivity::class.java)
@@ -34,6 +41,9 @@ class FloorAdapter(
             intent.putExtra("FLOOR_NAME", floor.name)
             intent.putExtra("FLOOR_WIDTH", floor.width)
             intent.putExtra("FLOOR_DEPTH", floor.depth)
+            intent.putExtra("FLOOR_PRODUCT_NAME", floor.productName)
+            intent.putExtra("FLOOR_PRODUCT_PRICE", floor.productPricePerSqm)
+            intent.putExtra("FLOOR_PRODUCT_COLOUR", floor.productColour)
             holder.itemView.context.startActivity(intent)
         }
     }

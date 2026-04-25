@@ -108,11 +108,11 @@ class QuoteActivity : AppCompatActivity() {
                                     for (floorDoc in floorsResult) {
                                         val floor = floorDoc.toObject(FloorSpace::class.java)
                                         val area = (floor.width * floor.depth) / 1_000_000
-                                        val price = area * 100
+                                        val price = area * floor.productPricePerSqm
 
                                         items.add(
                                             QuoteItem(
-                                                name = "Floor: ${floor.name}",
+                                                name = "Floor: ${floor.name} - ${floor.productName} (${floor.productColour})",
                                                 price = price
                                             )
                                         )

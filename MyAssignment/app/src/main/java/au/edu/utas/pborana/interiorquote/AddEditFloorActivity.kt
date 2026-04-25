@@ -18,6 +18,10 @@ class AddEditFloorActivity : AppCompatActivity() {
     private var roomId: String? = null
     private var floorId: String? = null
 
+    private var selectedProductName = ""
+    private var selectedProductPrice = 100.0
+    private var selectedProductColour = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,10 +36,15 @@ class AddEditFloorActivity : AppCompatActivity() {
         val txtName = findViewById<EditText>(R.id.txtFloorName)
         val txtWidth = findViewById<EditText>(R.id.txtWidth)
         val txtDepth = findViewById<EditText>(R.id.txtDepth)
+        val btnSelectProduct = findViewById<Button>(R.id.btnSelectProduct)
         val btnSave = findViewById<Button>(R.id.btnSaveFloor)
         val btnDelete = findViewById<Button>(R.id.btnDeleteFloor)
 
         btnBack.setOnClickListener { finish() }
+
+        btnSelectProduct.setOnClickListener {
+            showProductDialog(btnSelectProduct)
+        }
 
         if (floorId != null) {
             txtTitle.text = "Edit Floor Space"
@@ -45,6 +54,15 @@ class AddEditFloorActivity : AppCompatActivity() {
             txtName.setText(intent.getStringExtra("FLOOR_NAME"))
             txtWidth.setText(intent.getDoubleExtra("FLOOR_WIDTH", 0.0).toString())
             txtDepth.setText(intent.getDoubleExtra("FLOOR_DEPTH", 0.0).toString())
+
+            selectedProductName = intent.getStringExtra("FLOOR_PRODUCT_NAME") ?: ""
+            selectedProductPrice = intent.getDoubleExtra("FLOOR_PRODUCT_PRICE", 100.0)
+            selectedProductColour = intent.getStringExtra("FLOOR_PRODUCT_COLOUR") ?: ""
+
+            if (selectedProductName.isNotEmpty()) {
+                btnSelectProduct.text =
+                    "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+            }
         }
 
         btnSave.setOnClickListener {
@@ -65,7 +83,10 @@ class AddEditFloorActivity : AppCompatActivity() {
             val floor = FloorSpace(
                 name = name,
                 width = width,
-                depth = depth
+                depth = depth,
+                productName = selectedProductName,
+                productPricePerSqm = selectedProductPrice,
+                productColour = selectedProductColour
             )
 
             val ref = db.collection("houses")
@@ -124,5 +145,26 @@ class AddEditFloorActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun showProductDialog(btnSelectProduct: Button) {
+        val productNames = arrayOf(
+            "Budget Carpet",
+            "Vinyl Flooring",
+            "Premium Timber"
+        )
+
+        val prices = arrayOf(100.0, 130.0, 180.0)
+        val colours = arrayOf("Beige", "Grey", "Oak")
+
+        AlertDialog.Builder(this)
+            .setTitle("Select Floor Product")
+            .setItems(productNames) { _, which ->
+                selectedProductName = productNames[which]
+                selectedProductPrice = prices[which]
+                selectedProductColour = colours[which]
+                btnSelectProduct.text = "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+            }
+            .show()
     }
 }
