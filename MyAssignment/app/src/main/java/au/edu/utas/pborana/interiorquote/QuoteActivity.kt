@@ -131,7 +131,23 @@ class QuoteActivity : AppCompatActivity() {
             .filter { it.isSelected }
             .sumOf { it.price }
 
-        txtTotal.text = "Total: $" + String.format("%.2f", total)
+        txtTotal.text = "Custom Quote Total: $" + String.format("%.2f", total)
+
+        val budgetPrice = total * 0.90
+        val premiumPrice = total * 0.85
+        val luxuryPrice = total * 0.80
+
+        findViewById<TextView>(R.id.txtBudgetPackage).text =
+            "Budget Room Package: $" + String.format("%.2f", budgetPrice) +
+                    "  (was $" + String.format("%.2f", total) + ")"
+
+        findViewById<TextView>(R.id.txtPremiumPackage).text =
+            "Premium Comfort Package: $" + String.format("%.2f", premiumPrice) +
+                    "  (was $" + String.format("%.2f", total) + ")"
+
+        findViewById<TextView>(R.id.txtLuxuryPackage).text =
+            "Luxury Full Room Package: $" + String.format("%.2f", luxuryPrice) +
+                    "  (was $" + String.format("%.2f", total) + ")"
     }
 
     private fun shareQuote() {

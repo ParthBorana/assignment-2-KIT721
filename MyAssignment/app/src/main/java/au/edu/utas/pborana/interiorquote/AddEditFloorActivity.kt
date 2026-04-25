@@ -75,17 +75,26 @@ class AddEditFloorActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (selectedProductName.isEmpty()) {
+                Toast.makeText(this, "Select a product first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (houseId == null || roomId == null) {
                 Toast.makeText(this, "Missing room information", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            val extra = btnSelectProduct.tag as? Triple<String, String, String>
 
             val floor = FloorSpace(
                 name = name,
                 width = width,
                 depth = depth,
                 productName = selectedProductName,
+                productDescription = extra?.first ?: "",
                 productPricePerSqm = selectedProductPrice,
+                productImageUrl = extra?.second ?: "",
                 productColour = selectedProductColour
             )
 
@@ -148,22 +157,54 @@ class AddEditFloorActivity : AppCompatActivity() {
     }
 
     private fun showProductDialog(btnSelectProduct: Button) {
+
         val productNames = arrayOf(
             "Budget Carpet",
             "Vinyl Flooring",
             "Premium Timber"
         )
 
+        val descriptions = arrayOf(
+            "Affordable soft carpet flooring",
+            "Durable waterproof vinyl flooring",
+            "High quality natural timber finish"
+        )
+
         val prices = arrayOf(100.0, 130.0, 180.0)
-        val colours = arrayOf("Beige", "Grey", "Oak")
+
+        val imageUrls = arrayOf(
+            "https://example.com/carpet.jpg",
+            "https://example.com/vinyl.jpg",
+            "https://example.com/timber.jpg"
+        )
+
+        val colourOptions = arrayOf(
+            arrayOf("Beige", "Brown"),
+            arrayOf("Grey", "Black"),
+            arrayOf("Oak", "Walnut")
+        )
 
         AlertDialog.Builder(this)
             .setTitle("Select Floor Product")
             .setItems(productNames) { _, which ->
-                selectedProductName = productNames[which]
-                selectedProductPrice = prices[which]
-                selectedProductColour = colours[which]
-                btnSelectProduct.text = "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+
+                AlertDialog.Builder(this)
+                    .setTitle("Select Colour")
+                    .setItems(colourOptions[which]) { _, colourIndex ->
+
+                        selectedProductName = productNames[which]
+                        selectedProductPrice = prices[which]
+                        selectedProductColour = colourOptions[which][colourIndex]
+
+                        val desc = descriptions[which]
+                        val img = imageUrls[which]
+
+                        btnSelectProduct.text =
+                            "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+
+                        btnSelectProduct.tag = Triple(desc, img, selectedProductColour)
+                    }
+                    .show()
             }
             .show()
     }

@@ -6,6 +6,8 @@ data class Window(
     var width: Double = 0.0,
     var height: Double = 0.0,
     var productName: String = "",
+    var productDescription: String = "",
     var productPricePerSqm: Double = 50.0,
+    var productImageUrl: String = "",
     var productColour: String = ""
 )

@@ -1,23 +1,46 @@
 package au.edu.utas.pborana.interiorquote
 
+import android.Manifest
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.File
 
 class AddEditRoomActivity : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private var houseId: String? = null
     private var roomId: String? = null
+    private var imageUri: Uri? = null
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                openCamera()
+            } else {
+                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private val cameraLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                findViewById<ImageView>(R.id.imgRoom).setImageURI(imageUri)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +57,15 @@ class AddEditRoomActivity : AppCompatActivity() {
         val txtRoomSize = findViewById<EditText>(R.id.txtRoomSize)
         val btnSaveRoom = findViewById<Button>(R.id.btnSaveRoom)
         val btnDeleteRoom = findViewById<Button>(R.id.btnDeleteRoom)
+        val btnTakePhoto = findViewById<Button>(R.id.btnTakePhoto)
+        val imgRoom = findViewById<ImageView>(R.id.imgRoom)
 
         btnBack.setOnClickListener {
             finish()
+        }
+
+        btnTakePhoto.setOnClickListener {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
 
         if (roomId != null) {
@@ -47,6 +76,12 @@ class AddEditRoomActivity : AppCompatActivity() {
             txtRoomName.setText(intent.getStringExtra("ROOM_NAME"))
             txtRoomType.setText(intent.getStringExtra("ROOM_TYPE"))
             txtRoomSize.setText(intent.getStringExtra("ROOM_SIZE"))
+
+            val savedImage = intent.getStringExtra("ROOM_IMAGE") ?: ""
+            if (savedImage.isNotEmpty()) {
+                imageUri = Uri.parse(savedImage)
+                imgRoom.setImageURI(imageUri)
+            }
         }
 
         btnSaveRoom.setOnClickListener {
@@ -67,7 +102,8 @@ class AddEditRoomActivity : AppCompatActivity() {
             val room = Room(
                 name = roomName,
                 type = roomType,
-                size = roomSize
+                size = roomSize,
+                imageUri = imageUri?.toString() ?: ""
             )
 
             val roomsCollection = db.collection("houses")
@@ -126,6 +162,20 @@ class AddEditRoomActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+    }
+
+    private fun openCamera() {
+        val file = File(getExternalFilesDir("Pictures"), "room_photo_${System.currentTimeMillis()}.jpg")
+
+        imageUri = FileProvider.getUriForFile(
+            this,
+            "au.edu.utas.pborana.interiorquote.provider",
+            file
+        )
+
+        imageUri?.let {
+            cameraLauncher.launch(it)
         }
     }
 }

@@ -6,6 +6,8 @@ data class FloorSpace(
     var width: Double = 0.0,
     var depth: Double = 0.0,
     var productName: String = "",
+    var productDescription: String = "",
     var productPricePerSqm: Double = 100.0,
+    var productImageUrl: String = "",
     var productColour: String = ""
 )

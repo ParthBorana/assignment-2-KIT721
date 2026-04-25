@@ -4,5 +4,6 @@ data class Room(
     var id: String? = null,
     var name: String = "",
     var type: String = "",
-    var size: String = ""
+    var size: String = "",
+    var imageUri: String = ""
 )

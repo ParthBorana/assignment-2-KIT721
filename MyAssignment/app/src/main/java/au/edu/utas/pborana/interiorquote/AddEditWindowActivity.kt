@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.math.ceil
 
 class AddEditWindowActivity : AppCompatActivity() {
 
@@ -62,8 +63,7 @@ class AddEditWindowActivity : AppCompatActivity() {
             selectedProductColour = intent.getStringExtra("WINDOW_PRODUCT_COLOUR") ?: ""
 
             if (selectedProductName.isNotEmpty()) {
-                btnSelectProduct.text =
-                    "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+                btnSelectProduct.text = "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
             }
         }
 
@@ -77,17 +77,30 @@ class AddEditWindowActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (selectedProductName.isEmpty()) {
+                Toast.makeText(this, "Select a product first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!validateSelectedProduct(width, height)) {
+                return@setOnClickListener
+            }
+
             if (houseId == null || roomId == null) {
                 Toast.makeText(this, "Missing room information", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
+            val extra = btnSelectProduct.tag as? Pair<String, String>
 
             val window = Window(
                 name = name,
                 width = width,
                 height = height,
                 productName = selectedProductName,
+                productDescription = extra?.first ?: "",
                 productPricePerSqm = selectedProductPrice,
+                productImageUrl = extra?.second ?: "",
                 productColour = selectedProductColour
             )
 
@@ -150,18 +163,41 @@ class AddEditWindowActivity : AppCompatActivity() {
     }
 
     private fun showProductDialog(btnSelectProduct: Button) {
+
         val productNames = arrayOf(
             "Standard Roller Blind",
             "Premium Curtain",
-            "Luxury Shutter"
+            "Modular Vertical Slat",
+            "Plantation Shutter"
         )
 
-        val prices = arrayOf(50.0, 80.0, 120.0)
-        val colours = arrayOf("White", "Grey", "Black")
+        val descriptions = arrayOf(
+            "Basic roller blind suitable for small windows",
+            "Premium curtain with extended width range",
+            "Modular slat system for large windows",
+            "Fixed size shutter panels"
+        )
+
+        val prices = arrayOf(50.0, 80.0, 95.0, 120.0)
+
+        val imageUrls = arrayOf(
+            "https://example.com/roller.jpg",
+            "https://example.com/curtain.jpg",
+            "https://example.com/slat.jpg",
+            "https://example.com/shutter.jpg"
+        )
+
+        val colourOptions = arrayOf(
+            arrayOf("White", "Grey"),
+            arrayOf("Beige", "Black"),
+            arrayOf("White", "Black"),
+            arrayOf("Oak", "Walnut")
+        )
 
         AlertDialog.Builder(this)
             .setTitle("Select Product")
             .setItems(productNames) { _, which ->
+
                 val width = findViewById<EditText>(R.id.txtWidth).text.toString().toDoubleOrNull()
                 val height = findViewById<EditText>(R.id.txtHeight).text.toString().toDoubleOrNull()
 
@@ -170,31 +206,100 @@ class AddEditWindowActivity : AppCompatActivity() {
                     return@setItems
                 }
 
-                if (which == 0 && (width < 500.0 || width > 1200.0)) {
-                    Toast.makeText(this, "Standard Roller Blind width must be 500–1200 mm", Toast.LENGTH_SHORT).show()
+                val productName = productNames[which]
+
+                if (!validateProduct(productName, width, height)) {
                     return@setItems
                 }
 
-                if (which == 1 && (width < 500.0 || width > 2000.0)) {
-                    Toast.makeText(this, "Premium Curtain width must be 500–2000 mm", Toast.LENGTH_SHORT).show()
-                    return@setItems
-                }
+                // second dialog for colour selection
+                AlertDialog.Builder(this)
+                    .setTitle("Select Colour")
+                    .setItems(colourOptions[which]) { _, colourIndex ->
 
-                if (which == 2 && width != 800.0) {
-                    Toast.makeText(this, "Luxury Shutter only supports 800 mm width", Toast.LENGTH_SHORT).show()
-                    return@setItems
-                }
+                        selectedProductName = productName
+                        selectedProductPrice = prices[which]
+                        selectedProductColour = colourOptions[which][colourIndex]
 
-                if (height < 500.0 || height > 2500.0) {
-                    Toast.makeText(this, "Height must be 500–2500 mm", Toast.LENGTH_SHORT).show()
-                    return@setItems
-                }
+                        val selectedDescription = descriptions[which]
+                        val selectedImageUrl = imageUrls[which]
 
-                selectedProductName = productNames[which]
-                selectedProductPrice = prices[which]
-                selectedProductColour = colours[which]
-                btnSelectProduct.text = "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+                        btnSelectProduct.text =
+                            "$selectedProductName ($selectedProductPrice/m²) - $selectedProductColour"
+
+                        // store extra data using tags (simple method)
+                        btnSelectProduct.tag = Pair(selectedDescription, selectedImageUrl)
+                    }
+                    .show()
             }
             .show()
+    }
+
+    private fun validateSelectedProduct(width: Double, height: Double): Boolean {
+        return validateProduct(selectedProductName, width, height)
+    }
+
+    private fun validateProduct(productName: String, width: Double, height: Double): Boolean {
+        if (height < 500.0 || height > 2500.0) {
+            Toast.makeText(this, "Height must be 500–2500 mm", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        return when (productName) {
+            "Standard Roller Blind" -> validateDirectFit(width, 500.0, 1200.0, productName)
+            "Premium Curtain" -> validateDirectFit(width, 500.0, 2000.0, productName)
+            "Modular Vertical Slat" -> validateMultiPanel(width, 600.0, 1000.0, 4, productName)
+            "Plantation Shutter" -> validateRigidIncrement(width, 800.0, 3, productName)
+            else -> {
+                Toast.makeText(this, "Select a valid product", Toast.LENGTH_SHORT).show()
+                false
+            }
+        }
+    }
+
+    private fun validateDirectFit(width: Double, minWidth: Double, maxWidth: Double, productName: String): Boolean {
+        if (width < minWidth || width > maxWidth) {
+            Toast.makeText(this, "$productName width must be ${minWidth.toInt()}–${maxWidth.toInt()} mm", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
+
+    private fun validateMultiPanel(width: Double, minWidth: Double, maxWidth: Double, maxPanels: Int, productName: String): Boolean {
+        if (width < minWidth) {
+            Toast.makeText(this, "$productName width must be at least ${minWidth.toInt()} mm", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        if (width <= maxWidth) {
+            return true
+        }
+
+        val requiredPanels = ceil(width / maxWidth).toInt()
+
+        if (requiredPanels > maxPanels) {
+            Toast.makeText(this, "$productName needs $requiredPanels panels, max allowed is $maxPanels", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        val panelWidth = width / requiredPanels
+
+        if (panelWidth < minWidth || panelWidth > maxWidth) {
+            Toast.makeText(this, "$productName cannot split into valid panel widths", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        return true
+    }
+
+    private fun validateRigidIncrement(width: Double, panelWidth: Double, maxPanels: Int, productName: String): Boolean {
+        for (panels in 1..maxPanels) {
+            if (width == panelWidth * panels) {
+                return true
+            }
+        }
+
+        Toast.makeText(this, "$productName only supports 800, 1600, or 2400 mm width", Toast.LENGTH_SHORT).show()
+        return false
     }
 }

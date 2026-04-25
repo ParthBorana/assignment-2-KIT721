@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.utas.pborana.interiorquote.databinding.ItemRoomBinding
+import android.net.Uri
 
 class RoomAdapter(
     private val rooms: MutableList<Room>,
@@ -42,6 +43,14 @@ class RoomAdapter(
             intent.putExtra("ROOM_ID", room.id)
             intent.putExtra("ROOM_NAME", room.name)
             holder.itemView.context.startActivity(intent)
+        }
+
+        val imageView = holder.ui.imgRoomItem
+
+        if (room.imageUri.isNotEmpty()) {
+            imageView.setImageURI(Uri.parse(room.imageUri))
+        } else {
+            imageView.setImageResource(android.R.color.darker_gray)
         }
     }
 
