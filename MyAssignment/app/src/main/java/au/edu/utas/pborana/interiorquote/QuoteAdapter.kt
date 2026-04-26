@@ -24,14 +24,14 @@ class QuoteAdapter(
         // Set name
         holder.ui.txtItemName.text = item.name
 
-        // Set price (safe formatting)
+        // Set price
         holder.ui.txtItemPrice.text = "$" + String.format("%.2f", item.price)
 
         // Prevent checkbox glitch
         holder.ui.checkItem.setOnCheckedChangeListener(null)
         holder.ui.checkItem.isChecked = item.isSelected
 
-        // Handle checkbox click
+        //  checkbox click
         holder.ui.checkItem.setOnCheckedChangeListener { _, isChecked ->
             item.isSelected = isChecked
             onUpdate()

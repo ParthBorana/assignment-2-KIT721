@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".AddEditHouseActivity">
 
-    <!-- Top Row: Back + Centered Title -->
+    <!-- Top Row Backbutton with Title -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"

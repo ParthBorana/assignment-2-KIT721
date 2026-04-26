@@ -35,7 +35,7 @@ class AddEditHouseActivity : AppCompatActivity() {
             finish()
         }
 
-        // Check if screen opened for editing
+
         houseId = intent.getStringExtra("HOUSE_ID")
         val houseName = intent.getStringExtra("HOUSE_NAME")
         val houseAddress = intent.getStringExtra("HOUSE_ADDRESS")
