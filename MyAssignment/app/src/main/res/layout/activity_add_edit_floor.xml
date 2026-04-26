@@ -102,7 +102,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Select Product"
+        android:text="🛒 Select Product"
         app:layout_constraintTop_toBottomOf="@id/depthRow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -112,7 +112,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Save Floor Space"
+        android:text="💾 Save Floor Space"
         app:layout_constraintTop_toBottomOf="@id/btnSelectProduct"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -123,7 +123,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:backgroundTint="#F44336"
-        android:text="Delete Floor Space"
+        android:text="🗑 Delete Floor Space"
         android:textColor="@android:color/white"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/btnSaveFloor"

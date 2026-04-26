@@ -6,7 +6,6 @@
     android:padding="12dp"
     android:gravity="center_vertical">
 
-    <!-- ✅ ADD THIS IMAGE HERE (LEFT SIDE) -->
     <ImageView
         android:id="@+id/imgRoomItem"
         android:layout_width="60dp"
@@ -15,7 +14,6 @@
         android:scaleType="centerCrop"
         android:background="#DDDDDD" />
 
-    <!-- EXISTING TEXT BLOCK -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -45,11 +43,10 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- EXISTING BUTTON -->
     <Button
         android:id="@+id/btnEditRoom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit" />
+        android:text="✏️ Edit" />
 
 </LinearLayout>

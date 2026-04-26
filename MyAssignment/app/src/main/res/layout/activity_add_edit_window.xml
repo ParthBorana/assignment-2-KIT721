@@ -101,7 +101,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Select Product"
+        android:text="🛒 Select Product"
         app:layout_constraintTop_toBottomOf="@id/heightRow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -111,7 +111,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Save Window"
+        android:text="💾 Save Window"
         app:layout_constraintTop_toBottomOf="@id/btnSelectProduct"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -121,7 +121,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Delete Window"
+        android:text="🗑 Delete Window"
         android:backgroundTint="#F44336"
         android:textColor="@android:color/white"
         android:visibility="gone"
